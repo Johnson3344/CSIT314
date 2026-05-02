@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Platform Reports{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-chart-bar me-2 text-clay"></i>Platform Reports</h1>
+</div>
+
+<!-- Period Selector -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <form method="GET" class="d-flex gap-2 align-items-center">
+      <label class="form-label mb-0 me-2 fw-600">Report Period:</label>
+      {% for p in ['daily','weekly','monthly'] %}
+      <a href="{{ url_for('admin_reports', period=p) }}"
+         class="btn {% if period == p %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        {{ p|title }}
+      </a>
+      {% endfor %}
+    </form>
+  </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-value">${{ "%.0f"|format(report.total_raised or 0) }}</div>
+      <div class="stat-label">Total Raised (All Time)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ report.total_donations }}</div>
+      <div class="stat-label">Total Donations</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card stat-card">
+      <div class="stat-value">{{ report.fra_stats.get('active', 0) }}</div>
+      <div class="stat-label">Active FRAs</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ report.new_users }}</div>
+      <div class="stat-label">New Users
+        {% if period == 'daily' %}(30d)
+        {% elif period == 'weekly' %}(12w)
+        {% else %}(1yr){% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Donation Breakdown -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-table me-2"></i>
+        {{ period|title }} Donation Breakdown
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th class="text-end">Donations</th>
+              <th class="text-end">Total Raised</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.breakdown %}
+            <tr>
+              <td>{{ row.period }}</td>
+              <td class="text-end">{{ row.donation_count }}</td>
+              <td class="text-end fw-bold text-clay">${{ "%.2f"|format(row.total_amount or 0) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="3" class="text-center text-muted py-3">No data for this period.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header"><i class="fa fa-chart-pie me-2"></i>FRA Status Overview</div>
+      <div class="card-body">
+        {% for status, label, icon in [
+          ('active','Active','text-moss'),
+          ('pending','Pending Approval','text-warning'),
+          ('draft','Draft','text-secondary'),
+          ('closed','Closed','text-dark'),
+          ('total','Total','text-clay')
+        ] %}
+        <div class="d-flex justify-content-between py-1 border-bottom">
+          <span><i class="fa fa-circle me-2 {{ icon }}" style="font-size:.6rem;"></i>{{ label }}</span>
+          <strong class="{{ icon }}">{{ report.fra_stats.get(status, 0) }}</strong>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FRA Reports / Suspicious Activity -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="fa fa-flag me-2"></i>Reported FRAs</span>
+    <span class="badge bg-danger">
+      {{ fra_reports|selectattr('status','eq','pending')|list|length }} pending
+    </span>
+  </div>
+
+  <!-- Report search bar -->
+  <div class="card-body border-bottom py-3">
+    <form method="GET" class="row g-2 align-items-end">
+      <input type="hidden" name="period" value="{{ period }}">
+      <div class="col-md-4">
+        <label class="form-label mb-1" style="font-size:.83rem;">Search</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="fa fa-search"></i></span>
+          <input type="search" name="q" class="form-control"
+                 value="{{ keyword }}"
+                 placeholder="FRA title, reporter, or reason…">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label mb-1" style="font-size:.83rem;">Status</label>
+        <select name="r_status" class="form-select form-select-sm">
+          <option value="">All</option>
+          <option value="pending"  {% if r_status == 'pending'  %}selected{% endif %}>Pending</option>
+          <option value="reviewed" {% if r_status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label mb-1" style="font-size:.83rem;">From</label>
+        <input type="date" name="r_start" class="form-control form-control-sm"
+               value="{{ r_start }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label mb-1" style="font-size:.83rem;">To</label>
+        <input type="date" name="r_end" class="form-control form-control-sm"
+               value="{{ r_end }}">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="fa fa-filter me-1"></i>Filter
+        </button>
+        {% if keyword or r_status or r_start or r_end %}
+        <a href="{{ url_for('admin_reports', period=period) }}"
+           class="btn btn-outline-secondary btn-sm ms-1">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+    {% if keyword or r_status or r_start or r_end %}
+    <div class="mt-2" style="font-size:.82rem;color:var(--muted);">
+      Showing {{ fra_reports|length }} result{% if fra_reports|length != 1 %}s{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>FRA</th><th>Reporter</th><th>Reason</th>
+          <th>Status</th><th>Date</th><th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in fra_reports %}
+        <tr>
+          <td>{{ r.fra_title[:35] }}{% if r.fra_title|length > 35 %}…{% endif %}</td>
+          <td class="text-muted">{{ r.reporter_name }}</td>
+          <td class="text-muted">
+            {{ r.reason[:60] }}{% if r.reason|length > 60 %}…{% endif %}
+          </td>
+          <td>
+            {% if r.status == 'pending' %}
+              <span class="badge badge-status-pending">Pending</span>
+            {% else %}
+              <span class="badge badge-status-active">Reviewed</span>
+            {% endif %}
+          </td>
+          <td class="text-muted">{{ r.created_at[:10] }}</td>
+          <td class="text-end">
+            {% if r.status == 'pending' %}
+            <form method="POST"
+                  action="{{ url_for('admin_resolve_report', rid=r.id) }}"
+                  class="d-inline">
+              <button class="btn btn-sm btn-outline-success">
+                <i class="fa fa-check"></i> Resolve
+              </button>
+            </form>
+            {% else %}
+            <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-3">No reports.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

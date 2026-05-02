@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}User — {{ user.full_name }}{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h1>
+    <i class="fa fa-user-circle me-2 text-clay"></i>{{ user.full_name }}
+    <span class="badge badge-role-{{ user.role }} ms-2">{{ user.role|title }}</span>
+    {% if not user.is_active %}
+      <span class="badge badge-status-closed ms-1">Inactive</span>
+    {% endif %}
+  </h1>
+  <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="fa fa-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Edit form -->
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header"><i class="fa fa-edit me-2"></i>Edit Details</div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}">
+          <input type="hidden" name="action" value="update">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="full_name" class="form-control"
+                     value="{{ user.full_name }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control"
+                     value="{{ user.email }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Role</label>
+              <select name="role" class="form-select">
+                {% for r in ['admin','fundraiser','donee'] %}
+                <option value="{{ r }}" {% if user.role == r %}selected{% endif %}>{{ r|title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input type="text" name="phone" class="form-control"
+                     value="{{ user.phone or '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address</label>
+              <input type="text" name="address" class="form-control"
+                     value="{{ user.address or '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Bio</label>
+              <textarea name="bio" class="form-control" rows="2">{{ user.bio or '' }}</textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">
+            <i class="fa fa-save me-1"></i>Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="col-lg-5 d-flex flex-column gap-3">
+    <!-- Account Info -->
+    <div class="card">
+      <div class="card-header"><i class="fa fa-circle-info me-2"></i>Account Info</div>
+      <div class="card-body">
+        <dl class="row mb-0" style="font-size:.9rem;">
+          <dt class="col-5">ID</dt><dd class="col-7">#{{ user.id }}</dd>
+          <dt class="col-5">Joined</dt>
+          <dd class="col-7">{{ user.created_at[:10] if user.created_at else '—' }}</dd>
+          <dt class="col-5">Last login</dt>
+          <dd class="col-7">{{ user.last_login[:10] if user.last_login else 'Never' }}</dd>
+          <dt class="col-5">Status</dt>
+          <dd class="col-7">
+            {% if user.is_active %}<span class="text-success">Active</span>
+            {% else %}<span class="text-danger">Inactive</span>{% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Reset Password -->
+    <div class="card">
+      <div class="card-header"><i class="fa fa-key me-2"></i>Reset Password</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}">
+          <input type="hidden" name="action" value="reset_password">
+          <div class="input-group">
+            <input type="password" name="new_password" class="form-control"
+                   placeholder="New password (min 6)" required>
+            <button type="submit" class="btn btn-warning">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Status / Delete -->
+    <div class="card border-danger">
+      <div class="card-header text-danger"><i class="fa fa-triangle-exclamation me-2"></i>Danger Zone</div>
+      <div class="card-body d-flex flex-wrap gap-2">
+        {% if user.is_active %}
+        <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}"
+              onsubmit="return confirm('Deactivate {{ user.full_name }}?')">
+          <input type="hidden" name="action" value="deactivate">
+          <button class="btn btn-outline-warning btn-sm">
+            <i class="fa fa-ban me-1"></i>Deactivate
+          </button>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}">
+          <input type="hidden" name="action" value="reactivate">
+          <button class="btn btn-outline-success btn-sm">
+            <i class="fa fa-check-circle me-1"></i>Reactivate
+          </button>
+        </form>
+        {% endif %}
+
+        {% if user.id != session.user_id and user.role != 'admin' %}
+        <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}"
+              onsubmit="return confirm('Permanently delete {{ user.full_name }}? This cannot be undone.')">
+          <input type="hidden" name="action" value="delete">
+          <button class="btn btn-outline-danger btn-sm">
+            <i class="fa fa-trash me-1"></i>Delete Account
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

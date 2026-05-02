@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-hand-holding-heart me-2 text-clay"></i>Welcome, {{ session.name }}!</h1>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <a href="{{ url_for('browse') }}" class="card text-decoration-none h-100">
+      <div class="card-body text-center py-4">
+        <i class="fa fa-search fa-2x text-clay mb-2"></i>
+        <div class="fw-bold text-bark">Browse FRAs</div>
+        <small class="text-muted">Discover campaigns to support</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-4">
+    <a href="{{ url_for('favourites') }}" class="card text-decoration-none h-100">
+      <div class="card-body text-center py-4">
+        <i class="fa fa-heart fa-2x text-clay mb-2"></i>
+        <div class="fw-bold text-bark">My Favourites</div>
+        <small class="text-muted">Campaigns you've saved</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-4">
+    <a href="{{ url_for('my_donations') }}" class="card text-decoration-none h-100">
+      <div class="card-body text-center py-4">
+        <i class="fa fa-hand-holding-dollar fa-2x text-clay mb-2"></i>
+        <div class="fw-bold text-bark">Donation History</div>
+        <small class="text-muted">View your contributions</small>
+      </div>
+    </a>
+  </div>
+</div>
+
+<h5 class="text-bark mb-3"><i class="fa fa-fire me-2 text-clay"></i>Featured Campaigns</h5>
+<div class="row g-3">
+  {% for f in featured %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card fra-card h-100">
+      {% if f.image_url %}
+      <img src="{{ f.image_url }}" class="fra-img" alt="{{ f.title }}"
+           onerror="this.parentElement.querySelector('.fra-img-placeholder').style.display='flex';this.style.display='none'">
+      {% endif %}
+      <div class="fra-img-placeholder" {% if f.image_url %}style="display:none"{% endif %}>
+        <i class="fa fa-heart"></i>
+      </div>
+      <div class="card-body">
+        <small class="text-muted">{{ f.category_name or 'General' }}</small>
+        <h6 class="mt-1 mb-2">
+          <a href="{{ url_for('fra_detail', fra_id=f.id) }}" class="text-bark text-decoration-none">
+            {{ f.title }}
+          </a>
+        </h6>
+        {% set pct = [(f.amount_raised / f.monetary_goal * 100) if f.monetary_goal > 0 else 0, 100]|min %}
+        <div class="progress mb-1">
+          <div class="progress-bar" style="width:{{ pct }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size:.8rem;">
+          <span class="text-clay fw-bold">${{ "%.0f"|format(f.amount_raised or 0) }}</span>
+          <span class="text-muted">of ${{ "%.0f"|format(f.monetary_goal) }}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="{{ url_for('fra_detail', fra_id=f.id) }}" class="btn btn-primary btn-sm w-100">
+          View Campaign
+        </a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-4">
+    No active campaigns yet.
+    <a href="{{ url_for('browse') }}">Browse all</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

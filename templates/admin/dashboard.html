@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-gauge-high me-2 text-clay"></i>Admin Dashboard</h1>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="stat-value">{{ stats.total_users }}</div>
+      <div class="stat-label"><i class="fa fa-users me-1"></i>Total Users</div>
+      <div class="mt-1" style="font-size:.8rem;color:var(--muted)">
+        {{ stats.active_users }} active · {{ stats.new_users_30d }} new (30d)
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ stats.fra_stats.get('active', 0) }}</div>
+      <div class="stat-label"><i class="fa fa-hand-holding-heart me-1"></i>Active FRAs</div>
+      <div class="mt-1" style="font-size:.8rem;color:var(--muted)">
+        {{ stats.fra_stats.get('total', 0) }} total · {{ stats.fra_stats.get('pending', 0) }} pending
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="stat-value">${{ "%.0f"|format(stats.total_raised or 0) }}</div>
+      <div class="stat-label"><i class="fa fa-dollar-sign me-1"></i>Total Raised</div>
+      <div class="mt-1" style="font-size:.8rem;color:var(--muted)">
+        {{ stats.total_donations }} donations
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card {% if stats.pending_fras > 0 %}border-warning{% endif %}">
+      <div class="stat-value {% if stats.pending_fras > 0 %}text-warning{% endif %}">
+        {{ stats.pending_fras }}
+      </div>
+      <div class="stat-label"><i class="fa fa-clock me-1"></i>Awaiting Approval</div>
+      <div class="mt-1" style="font-size:.8rem;">
+        {% if stats.pending_fras > 0 %}
+          <a href="{{ url_for('admin_approvals') }}" class="text-warning">Review now →</a>
+        {% else %}
+          <span class="text-muted">All clear</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Role Breakdown & Quick Actions -->
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="fa fa-chart-pie me-2"></i>User Roles</div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for role, label, icon in [
+              ('admin','Administrators','fa-user-shield'),
+              ('fundraiser','Fund Raisers','fa-seedling'),
+              ('donee','Donees','fa-hand-holding-heart'),
+              ('donor','Donors (legacy)','fa-hand-holding-dollar'),
+              ('volunteer','Volunteers (legacy)','fa-hands-helping')
+            ] %}
+            {% if stats.role_counts.get(role, 0) > 0 %}
+            <tr>
+              <td><i class="fa {{ icon }} me-2 text-clay"></i>{{ label }}</td>
+              <td class="text-end fw-bold">{{ stats.role_counts.get(role, 0) }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header"><i class="fa fa-bolt me-2"></i>Quick Actions</div>
+      <div class="card-body d-flex flex-wrap gap-2 align-content-start">
+        <a href="{{ url_for('admin_create_user') }}" class="btn btn-primary">
+          <i class="fa fa-user-plus me-1"></i>Create User
+        </a>
+        <a href="{{ url_for('admin_approvals') }}" class="btn btn-warning">
+          <i class="fa fa-clock me-1"></i>Review FRAs
+        </a>
+        <a href="{{ url_for('admin_categories') }}" class="btn btn-outline-primary">
+          <i class="fa fa-tags me-1"></i>Manage Categories
+        </a>
+        <a href="{{ url_for('admin_fras') }}" class="btn btn-outline-primary">
+          <i class="fa fa-list me-1"></i>All FRAs
+        </a>
+        <a href="{{ url_for('admin_reports') }}" class="btn btn-success">
+          <i class="fa fa-chart-bar me-1"></i>Generate Report
+        </a>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+          <i class="fa fa-users me-1"></i>Manage Users
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
