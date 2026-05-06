@@ -102,7 +102,11 @@
 
     <!-- Status / Delete -->
     <div class="card border-danger">
+<<<<<<< HEAD
       <div class="card-header text-danger"><i class="fa fa-triangle-exclamation me-2"></i>Account Management</div>
+=======
+      <div class="card-header text-danger"><i class="fa fa-triangle-exclamation me-2"></i>Danger Zone</div>
+>>>>>>> 524c812935e1415245bb42074faf40f44b69adb1
       <div class="card-body d-flex flex-wrap gap-2">
         {% if user.is_active %}
         <form method="POST" action="{{ url_for('admin_user_detail', uid=user.id) }}"
