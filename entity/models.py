@@ -14,16 +14,10 @@ DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'tacofundme.db')
 
 
 def get_db():
-<<<<<<< HEAD
     conn = sqlite3.connect(DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")
-=======
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
->>>>>>> 9478613c98caa37fe00de88251adc6915e95526c
     return conn
 
 
@@ -186,20 +180,12 @@ class BaseEntity:
     def _execute(cls, sql: str, params: tuple = ()):
         """Execute a write statement; returns lastrowid."""
         conn = cls._db()
-<<<<<<< HEAD
         try:
             cur = conn.execute(sql, params)
             conn.commit()
             return cur.lastrowid
         finally:
             conn.close()
-=======
-        cur = conn.execute(sql, params)
-        conn.commit()
-        last_id = cur.lastrowid
-        conn.close()
-        return last_id
->>>>>>> 9478613c98caa37fe00de88251adc6915e95526c
 
 
 # ── UserEntity ────────────────────────────────────────────────────────────────
@@ -239,7 +225,6 @@ class UserEntity(BaseEntity):
         allowed = {'full_name', 'email', 'bio', 'phone', 'address', 'role', 'is_active'}
         fields = {k: v for k, v in kwargs.items() if k in allowed}
         if not fields:
-<<<<<<< HEAD
             return True, None
         clause = ', '.join(f"{k}=?" for k in fields)
         conn = cls._db()
@@ -252,14 +237,6 @@ class UserEntity(BaseEntity):
             return False, "An account with this email already exists"
         finally:
             conn.close()
-=======
-            return
-        clause = ', '.join(f"{k}=?" for k in fields)
-        conn = cls._db()
-        conn.execute(f"UPDATE users SET {clause} WHERE id=?", list(fields.values()) + [user_id])
-        conn.commit()
-        conn.close()
->>>>>>> 9478613c98caa37fe00de88251adc6915e95526c
 
     @classmethod
     def update_password(cls, user_id: int, hashed_password: str):
