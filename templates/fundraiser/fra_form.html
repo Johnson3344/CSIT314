@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{% if action == 'edit' %}Edit FRA{% else %}Create FRA{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h1>
+    <i class="fa fa-{% if action == 'edit' %}edit{% else %}plus-circle{% endif %} me-2 text-clay"></i>
+    {% if action == 'edit' %}Edit Campaign{% else %}Create New Campaign{% endif %}
+  </h1>
+  <a href="{{ url_for('fr_fras') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="fa fa-arrow-left me-1"></i>Back to My FRAs
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST"
+              action="{{ url_for('fr_edit_fra', fra_id=fra.id) if action == 'edit' else url_for('fr_create_fra') }}">
+
+          <div class="mb-3">
+            <label class="form-label">Campaign Title *</label>
+            <input type="text" name="title" class="form-control"
+                   value="{{ fd.get('title','') }}"
+                   required minlength="3"
+                   placeholder="Give your campaign a compelling title">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description *</label>
+            <textarea name="description" class="form-control" rows="6"
+                      required minlength="10"
+                      placeholder="Tell your story — why this matters, who it helps, how funds will be used…">{{ fd.get('description','') }}</textarea>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Category</label>
+              <select name="category_id" class="form-select">
+                <option value="">— Select a category —</option>
+                {% for c in categories %}
+                <option value="{{ c.id }}"
+                        {% if fd.get('category_id')|string == c.id|string %}selected{% endif %}>
+                  {{ c.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Monetary Goal ($)</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="monetary_goal" class="form-control"
+                       value="{{ fd.get('monetary_goal','') }}"
+                       min="0" step="0.01"
+                       placeholder="0.00">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Campaign Image URL
+              <small class="text-muted">(optional)</small>
+            </label>
+            <input type="url" name="image_url" id="image_url" class="form-control"
+                   value="{{ fd.get('image_url','') or '' }}"
+                   placeholder="https://example.com/photo.jpg">
+            <div class="form-text">Paste a public image URL — a preview will appear below.</div>
+            {% set current_img = fd.get('image_url','') or '' %}
+            <div class="mt-2">
+              <img id="img-preview"
+                   src="{{ current_img }}"
+                   alt="Image preview"
+                   class="img-thumbnail{% if not current_img %} d-none{% endif %}"
+                   style="max-height:200px;width:100%;object-fit:cover;"
+                   onerror="this.classList.add('d-none')">
+            </div>
+          </div>
+
+          {% if action == 'edit' %}
+          <div class="alert alert-info">
+            <i class="fa fa-circle-info me-2"></i>
+            Only <strong>draft</strong> campaigns can be edited. Once submitted for review, contact admin for changes.
+          </div>
+          {% endif %}
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa fa-save me-1"></i>
+              {% if action == 'edit' %}Save Changes{% else %}Create Campaign{% endif %}
+            </button>
+            {% if action == 'edit' %}
+            <a href="{{ url_for('fr_fra_detail', fra_id=fra.id) }}"
+               class="btn btn-outline-secondary">Cancel</a>
+            {% else %}
+            <a href="{{ url_for('fr_fras') }}" class="btn btn-outline-secondary">Cancel</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if action == 'create' %}
+    <div class="card mt-3 bg-sand">
+      <div class="card-body py-2 px-3" style="font-size:.85rem;">
+        <strong class="text-bark">Next steps after creating:</strong>
+        <span class="text-muted">
+          Your campaign starts as a <em>draft</em>. Review it, then submit for admin approval.
+          Once approved it goes live for donees to support!
+        </span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  const preview = document.getElementById('img-preview');
+  document.getElementById('image_url').addEventListener('input', function () {
+    const url = this.value.trim();
+    if (!url) { preview.classList.add('d-none'); return; }
+    preview.src = url;
+    preview.classList.remove('d-none');
+    preview.onerror = () => preview.classList.add('d-none');
+  });
+</script>
+{% endblock %}

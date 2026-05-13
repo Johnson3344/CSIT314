@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Donation History{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-hand-holding-dollar me-2 text-clay"></i>My Donation History</h1>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label mb-1" style="font-size:.85rem;">Category</label>
+        <select name="category_id" class="form-select">
+          <option value="">All Categories</option>
+          {% for c in categories %}
+          <option value="{{ c.id }}" {% if cat_id == c.id|string %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label mb-1" style="font-size:.85rem;">From</label>
+        <input type="date" name="start_date" class="form-control" value="{{ start }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label mb-1" style="font-size:.85rem;">To</label>
+        <input type="date" name="end_date" class="form-control" value="{{ end }}">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-filter me-1"></i>Filter
+        </button>
+        <a href="{{ url_for('my_donations') }}" class="btn btn-outline-secondary ms-1">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-md-4">
+    <div class="card stat-card">
+      <div class="stat-value">${{ "%.2f"|format(total) }}</div>
+      <div class="stat-label">Total Donated</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-md-4">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ donations|length }}</div>
+      <div class="stat-label">Donations Made</div>
+    </div>
+  </div>
+</div>
+
+{% if donations %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Campaign</th><th>Category</th><th>Amount</th>
+          <th>Message</th><th>Status</th><th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in donations %}
+        <tr>
+          <td>
+            {% if d.fra_status == 'active' %}
+            <a href="{{ url_for('fra_detail', fra_id=d.fra_id) }}">{{ d.fra_title }}</a>
+            {% else %}
+            {{ d.fra_title }}
+            {% endif %}
+          </td>
+          <td class="text-muted">{{ d.category_name or '—' }}</td>
+          <td class="fw-bold text-clay">${{ "%.2f"|format(d.amount) }}</td>
+          <td class="text-muted">
+            {% if d.message %}
+            <span title="{{ d.message }}">{{ d.message[:40] }}{% if d.message|length > 40 %}…{% endif %}</span>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="badge badge-status-{{ d.fra_status }}">
+              {{ d.fra_status|title }}
+            </span>
+          </td>
+          <td class="text-muted">{{ d.donated_at[:10] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5 card">
+  <div class="card-body">
+    <i class="fa fa-hand-holding-dollar fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">No donations found</h5>
+    {% if cat_id or start or end %}
+    <p class="text-muted">No donations match your filters.
+      <a href="{{ url_for('my_donations') }}">Clear filters</a>
+    </p>
+    {% else %}
+    <p class="text-muted">You haven't made any donations yet.</p>
+    <a href="{{ url_for('browse') }}" class="btn btn-primary">
+      <i class="fa fa-search me-1"></i>Browse Campaigns
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

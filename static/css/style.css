@@ -1,0 +1,324 @@
+/* TACOFundMe — Custom Design System */
+
+:root {
+  --clay:        #c4714a;
+  --clay-dark:   #a85a35;
+  --clay-light:  #e8956e;
+  --sand:        #f5ede0;
+  --bark:        #3d2b1f;
+  --moss:        #6b7c5a;
+  --moss-dark:   #556347;
+  --parchment:   #fdf8f2;
+  --warm-white:  #fff9f4;
+  --muted:       #8c7b6b;
+}
+
+/* ── Global ───────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--parchment);
+  color: var(--bark);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+a { color: var(--clay); }
+a:hover { color: var(--clay-dark); }
+
+/* ── Navbar ───────────────────────────────────────────────────────────── */
+.navbar {
+  background-color: var(--bark) !important;
+  border-bottom: 3px solid var(--clay);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sand) !important;
+  letter-spacing: 1px;
+}
+
+.navbar-brand span { color: var(--clay-light); }
+
+.navbar .nav-link {
+  color: var(--sand) !important;
+  font-weight: 500;
+  transition: color .2s;
+  padding: .5rem .9rem;
+  border-radius: 4px;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--clay-light) !important;
+  background: rgba(255,255,255,.06);
+}
+
+.navbar .dropdown-menu {
+  background-color: var(--bark);
+  border: 1px solid var(--clay);
+}
+
+.navbar .dropdown-item {
+  color: var(--sand);
+  font-size: .9rem;
+}
+
+.navbar .dropdown-item:hover {
+  background-color: var(--clay);
+  color: #fff;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.card {
+  border: 1px solid rgba(196,113,74,.2);
+  border-radius: 10px;
+  background-color: var(--warm-white);
+  box-shadow: 0 2px 8px rgba(61,43,31,.06);
+  transition: box-shadow .2s, transform .2s;
+}
+
+.card:hover { box-shadow: 0 4px 18px rgba(61,43,31,.12); }
+
+.card-header {
+  background-color: var(--sand);
+  border-bottom: 1px solid rgba(196,113,74,.25);
+  font-weight: 600;
+  color: var(--bark);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn-primary, .btn-clay {
+  background-color: var(--clay);
+  border-color: var(--clay);
+  color: #fff;
+}
+.btn-primary:hover, .btn-clay:hover {
+  background-color: var(--clay-dark);
+  border-color: var(--clay-dark);
+  color: #fff;
+}
+
+.btn-success, .btn-moss {
+  background-color: var(--moss);
+  border-color: var(--moss);
+  color: #fff;
+}
+.btn-success:hover, .btn-moss:hover {
+  background-color: var(--moss-dark);
+  border-color: var(--moss-dark);
+  color: #fff;
+}
+
+.btn-outline-primary {
+  color: var(--clay);
+  border-color: var(--clay);
+}
+.btn-outline-primary:hover {
+  background-color: var(--clay);
+  border-color: var(--clay);
+  color: #fff;
+}
+
+/* ── Badges ───────────────────────────────────────────────────────────── */
+.badge-role-admin      { background-color: #8b3a3a; color:#fff; }
+.badge-role-fundraiser { background-color: var(--clay); color:#fff; }
+.badge-role-donee      { background-color: var(--moss); color:#fff; }
+
+.badge-status-draft     { background-color: #6c757d; color:#fff; }
+.badge-status-pending   { background-color: #e5a030; color:#fff; }
+.badge-status-active    { background-color: var(--moss); color:#fff; }
+.badge-status-closed    { background-color: var(--bark); color:#fff; }
+
+/* ── Progress ─────────────────────────────────────────────────────────── */
+.progress {
+  background-color: var(--sand);
+  border-radius: 50px;
+  height: 12px;
+}
+.progress-bar {
+  background-color: var(--clay);
+  border-radius: 50px;
+}
+.progress-bar.over-goal { background-color: var(--moss); }
+
+/* ── FRA Cards ────────────────────────────────────────────────────────── */
+.fra-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fra-card .card-body { flex: 1; }
+
+.fra-card .fra-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 9px 9px 0 0;
+}
+
+.fra-img-placeholder {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, var(--sand), var(--clay-light));
+  border-radius: 9px 9px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--clay-dark);
+}
+
+/* ── Stat Cards ───────────────────────────────────────────────────────── */
+.stat-card {
+  border-left: 4px solid var(--clay);
+  padding: 1.2rem 1.5rem;
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--clay);
+}
+
+.stat-card .stat-label {
+  font-size: .85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.stat-card.moss { border-left-color: var(--moss); }
+.stat-card.moss .stat-value { color: var(--moss); }
+
+/* ── Tables ───────────────────────────────────────────────────────────── */
+.table thead th {
+  background-color: var(--sand);
+  color: var(--bark);
+  font-weight: 600;
+  border-bottom: 2px solid rgba(196,113,74,.3);
+  white-space: nowrap;
+}
+.table tbody tr:hover { background-color: rgba(245,237,224,.4); }
+
+/* ── Forms ────────────────────────────────────────────────────────────── */
+.form-control:focus, .form-select:focus {
+  border-color: var(--clay);
+  box-shadow: 0 0 0 .2rem rgba(196,113,74,.2);
+}
+
+.form-label { font-weight: 500; color: var(--bark); }
+
+/* ── Page header ──────────────────────────────────────────────────────── */
+.page-header {
+  border-bottom: 2px solid var(--clay);
+  padding-bottom: .75rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--bark);
+}
+
+/* ── Hero (auth) ──────────────────────────────────────────────────────── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--parchment) 60%, var(--sand));
+}
+
+.auth-card {
+  max-width: 440px;
+  width: 100%;
+}
+
+.auth-logo { font-size: 2.2rem; font-weight: 800; color: var(--clay); }
+.auth-logo span { color: var(--bark); }
+
+/* ── Comments ─────────────────────────────────────────────────────────── */
+.comment-block {
+  border-left: 3px solid var(--sand);
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.comment-reply {
+  border-left: 3px solid var(--clay-light);
+  margin-left: 2rem;
+  padding-left: 1rem;
+  margin-top: .5rem;
+  background: rgba(245,237,224,.3);
+  border-radius: 0 6px 6px 0;
+  padding: .6rem 1rem;
+}
+
+.comment-meta {
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────── */
+.page-link {
+  color: var(--clay);
+  border-color: rgba(196,113,74,.3);
+}
+.page-link:hover, .page-item.active .page-link {
+  background-color: var(--clay);
+  border-color: var(--clay);
+  color: #fff;
+}
+
+/* ── Alerts ───────────────────────────────────────────────────────────── */
+.alert {
+  border-radius: 8px;
+  border: none;
+  border-left: 4px solid;
+}
+.alert-success { border-left-color: var(--moss); background: #e8f4e8; color: #2d5a2d; }
+.alert-danger  { border-left-color: #c44; background: #fce8e8; color: #6b1f1f; }
+.alert-warning { border-left-color: #e5a030; background: #fef6e4; color: #7a5010; }
+.alert-info    { border-left-color: #5b8db8; background: #e8f0f8; color: #2a4f72; }
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+footer {
+  background-color: var(--bark);
+  color: var(--sand);
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+  font-size: .88rem;
+}
+
+footer a { color: var(--clay-light); text-decoration: none; }
+footer a:hover { color: var(--sand); }
+
+/* ── Utilities ────────────────────────────────────────────────────────── */
+.text-clay   { color: var(--clay) !important; }
+.text-bark   { color: var(--bark) !important; }
+.text-moss   { color: var(--moss) !important; }
+.text-muted-warm { color: var(--muted) !important; }
+.bg-sand     { background-color: var(--sand) !important; }
+.bg-parchment { background-color: var(--parchment) !important; }
+
+.divider {
+  border-top: 1px solid rgba(196,113,74,.2);
+  margin: 1.5rem 0;
+}
+
+.avatar-circle {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background-color: var(--clay);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
