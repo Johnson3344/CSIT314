@@ -62,19 +62,10 @@
             <label class="form-label">Campaign Image URL
               <small class="text-muted">(optional)</small>
             </label>
-            <input type="url" name="image_url" id="image_url" class="form-control"
+            <input type="url" name="image_url" class="form-control"
                    value="{{ fd.get('image_url','') or '' }}"
-                   placeholder="https://example.com/photo.jpg">
-            <div class="form-text">Paste a public image URL — a preview will appear below.</div>
-            {% set current_img = fd.get('image_url','') or '' %}
-            <div class="mt-2">
-              <img id="img-preview"
-                   src="{{ current_img }}"
-                   alt="Image preview"
-                   class="img-thumbnail{% if not current_img %} d-none{% endif %}"
-                   style="max-height:200px;width:100%;object-fit:cover;"
-                   onerror="this.classList.add('d-none')">
-            </div>
+                   placeholder="https://example.com/image.jpg">
+            <div class="form-text">Paste a public image URL to display on your campaign card.</div>
           </div>
 
           {% if action == 'edit' %}
@@ -113,15 +104,4 @@
     {% endif %}
   </div>
 </div>
-
-<script>
-  const preview = document.getElementById('img-preview');
-  document.getElementById('image_url').addEventListener('input', function () {
-    const url = this.value.trim();
-    if (!url) { preview.classList.add('d-none'); return; }
-    preview.src = url;
-    preview.classList.remove('d-none');
-    preview.onerror = () => preview.classList.add('d-none');
-  });
-</script>
 {% endblock %}
