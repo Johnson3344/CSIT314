@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h1><i class="fa fa-user-circle me-2 text-clay"></i>My Profile</h1>
+</div>
+
+<div class="row g-4">
+  <!-- Profile Details -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-id-card me-2"></i>Profile Information
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('profile') }}">
+          <input type="hidden" name="action" value="update">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="full_name" class="form-control"
+                   value="{{ user.full_name }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control"
+                   value="{{ user.email }}" disabled>
+            <div class="form-text">Email cannot be changed here.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control"
+                   value="{{ user.phone or '' }}" placeholder="+65 9123 4567">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input type="text" name="address" class="form-control"
+                   value="{{ user.address or '' }}" placeholder="123 Main St, Singapore">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea name="bio" class="form-control" rows="3"
+                      placeholder="Tell us about yourself…">{{ user.bio or '' }}</textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa fa-save me-1"></i>Save Profile
+            </button>
+            <span class="badge ms-auto align-self-center
+              {% if user.role == 'admin' %}badge-role-admin
+              {% elif user.role == 'fundraiser' %}badge-role-fundraiser
+              {% else %}badge-role-donee{% endif %}">
+              {{ user.role|title }}
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-lock me-2"></i>Change Password
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('profile') }}">
+          <input type="hidden" name="action" value="password">
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="current_password" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input type="password" name="new_password" class="form-control"
+                   required placeholder="Min. 6 characters">
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" name="confirm_new" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="fa fa-key me-1"></i>Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Account Info -->
+    <div class="card mt-4">
+      <div class="card-header"><i class="fa fa-circle-info me-2"></i>Account Info</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Member since</dt>
+          <dd class="col-7 text-muted">{{ user.created_at[:10] if user.created_at else '—' }}</dd>
+          <dt class="col-5">Last login</dt>
+          <dd class="col-7 text-muted">{{ user.last_login[:10] if user.last_login else '—' }}</dd>
+          <dt class="col-5">Status</dt>
+          <dd class="col-7">
+            {% if user.is_active %}
+              <span class="badge badge-status-active">Active</span>
+            {% else %}
+              <span class="badge badge-status-closed">Inactive</span>
+            {% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

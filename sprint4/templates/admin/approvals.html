@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}FRA Approvals{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-clock me-2 text-clay"></i>FRAs Awaiting Approval
+    <span class="badge bg-warning text-dark ms-2">{{ pending|length }}</span>
+  </h1>
+</div>
+
+{% if not pending %}
+<div class="text-center py-5">
+  <i class="fa fa-circle-check fa-3x text-moss mb-3"></i>
+  <h4 class="text-muted">All clear — no FRAs awaiting approval.</h4>
+  <a href="{{ url_for('admin_fras') }}" class="btn btn-outline-primary mt-2">View All FRAs</a>
+</div>
+{% else %}
+<div class="row g-4">
+  {% for f in pending %}
+  <div class="col-lg-6">
+    <div class="card h-100">
+      {% if f.image_url %}
+      <img src="{{ f.image_url }}" class="fra-img" alt="{{ f.title }}"
+           onerror="this.style.display='none'">
+      {% endif %}
+      <div class="card-body">
+        <h5 class="mb-1">{{ f.title }}</h5>
+        <div class="d-flex gap-2 mb-2">
+          <span class="badge badge-status-pending">Pending Review</span>
+          {% if f.category_name %}
+          <span class="badge bg-light text-dark border">{{ f.category_name }}</span>
+          {% endif %}
+        </div>
+        <p class="text-muted" style="font-size:.9rem;">
+          {{ f.description[:200] }}{% if f.description|length > 200 %}…{% endif %}
+        </p>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted" style="font-size:.85rem;">
+            <i class="fa fa-user me-1"></i>{{ f.fundraiser_name }}
+          </span>
+          <strong class="text-clay">${{ "%.0f"|format(f.monetary_goal) }} goal</strong>
+        </div>
+        <small class="text-muted">
+          Submitted: {{ f.updated_at[:10] if f.updated_at else f.created_at[:10] }}
+        </small>
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <form method="POST" action="{{ url_for('admin_approve_fra', fra_id=f.id) }}" class="flex-fill">
+          <button type="submit" class="btn btn-success w-100">
+            <i class="fa fa-check me-1"></i>Approve &amp; Go Live
+          </button>
+        </form>
+        <form method="POST" action="{{ url_for('admin_reject_fra', fra_id=f.id) }}"
+              onsubmit="return confirm('Return this FRA to draft?')">
+          <button type="submit" class="btn btn-outline-danger">
+            <i class="fa fa-times me-1"></i>Reject
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

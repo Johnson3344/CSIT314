@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TACOFundMe — Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 auth-card mx-auto">
+        <div class="text-center mb-4">
+          <div class="auth-logo">🌮 TACO<span>FundMe</span></div>
+          <p class="text-muted-warm mt-1">Together Achieving Community Outcomes</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }}">{{ msg }}</div>
+          {% endfor %}
+        {% endwith %}
+
+        <div class="card">
+          <div class="card-body p-4">
+            <h4 class="mb-3 text-bark">Sign In</h4>
+            <form method="POST" action="{{ url_for('login') }}">
+              <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input type="email" name="email" class="form-control"
+                       value="{{ email or '' }}" required autofocus
+                       placeholder="you@example.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control"
+                       required placeholder="••••••••">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fa fa-sign-in-alt me-2"></i>Sign In
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <p class="text-center mt-3 text-muted-warm">
+          Don't have an account?
+          <a href="{{ url_for('register') }}">Create one</a>
+        </p>
+
+        <div class="card mt-3" style="font-size:.82rem;background:rgba(245,237,224,.6);">
+          <div class="card-body py-2 px-3">
+            <strong class="text-bark">Demo accounts:</strong>
+            <span class="text-muted">admin@tacofundme.org / admin123</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

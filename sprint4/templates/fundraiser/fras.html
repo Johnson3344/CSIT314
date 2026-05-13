@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}My FRAs{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <h1><i class="fa fa-rectangle-list me-2 text-clay"></i>My Fundraising Activities</h1>
+  <a href="{{ url_for('fr_create_fra') }}" class="btn btn-primary">
+    <i class="fa fa-plus me-1"></i>Create FRA
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <input type="search" name="q" class="form-control"
+               value="{{ search }}" placeholder="Search…">
+      </div>
+      <div class="col-md-2">
+        <select name="status" class="form-select">
+          <option value="">All Statuses</option>
+          {% for s in ['draft','pending_approval','active','closed'] %}
+          <option value="{{ s }}" {% if status == s %}selected{% endif %}>
+            {{ s|replace('_',' ')|title }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="category_id" class="form-select">
+          <option value="">All Categories</option>
+          {% for c in categories %}
+          <option value="{{ c.id }}" {% if cat_id == c.id|string %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="date" name="start_date" class="form-control"
+               value="{{ start }}" title="From date">
+      </div>
+      <div class="col-md-2">
+        <input type="date" name="end_date" class="form-control"
+               value="{{ end }}" title="To date">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-filter me-1"></i>Filter
+        </button>
+        <a href="{{ url_for('fr_fras') }}" class="btn btn-outline-secondary ms-1">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if fras %}
+<div class="row g-4">
+  {% for f in fras %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card fra-card">
+      {% if f.image_url %}
+      <img src="{{ f.image_url }}" class="fra-img" alt="{{ f.title }}"
+           onerror="this.parentElement.querySelector('.fra-img-placeholder').style.display='flex';this.style.display='none'">
+      {% endif %}
+      <div class="fra-img-placeholder" {% if f.image_url %}style="display:none"{% endif %}>
+        <i class="fa fa-heart"></i>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="badge badge-status-{{ f.status }}">
+            {{ f.status|replace('_',' ')|title }}
+          </span>
+          <small class="text-muted">{{ f.category_name or 'Uncategorised' }}</small>
+        </div>
+        <h6 class="mt-2 mb-1">
+          <a href="{{ url_for('fr_fra_detail', fra_id=f.id) }}" class="text-bark text-decoration-none">
+            {{ f.title }}
+          </a>
+        </h6>
+        <p class="text-muted" style="font-size:.82rem;">
+          {{ f.description[:80] }}{% if f.description|length > 80 %}…{% endif %}
+        </p>
+
+        {% set pct = [(f.amount_raised / f.monetary_goal * 100) if f.monetary_goal > 0 else 0, 100]|min %}
+        <div class="progress mb-1">
+          <div class="progress-bar {% if pct >= 100 %}over-goal{% endif %}"
+               style="width: {{ pct }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size:.8rem;">
+          <span class="text-clay fw-bold">${{ "%.0f"|format(f.amount_raised or 0) }}</span>
+          <span class="text-muted">of ${{ "%.0f"|format(f.monetary_goal) }}</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="d-flex gap-3 text-muted" style="font-size:.8rem;">
+          <span><i class="fa fa-eye me-1"></i>{{ f.view_count }}</span>
+          <span><i class="fa fa-heart me-1"></i>{{ f.favorite_count }}</span>
+          <span class="ms-auto">{{ f.created_at[:10] }}</span>
+        </div>
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <a href="{{ url_for('fr_fra_detail', fra_id=f.id) }}"
+           class="btn btn-outline-primary btn-sm flex-fill">
+          <i class="fa fa-eye me-1"></i>View
+        </a>
+        {% if f.status == 'draft' %}
+        <a href="{{ url_for('fr_edit_fra', fra_id=f.id) }}"
+           class="btn btn-outline-secondary btn-sm">
+          <i class="fa fa-edit"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 card">
+  <div class="card-body">
+    <i class="fa fa-seedling fa-3x text-clay mb-3"></i>
+    <h5 class="text-muted">No campaigns found</h5>
+    <a href="{{ url_for('fr_create_fra') }}" class="btn btn-primary mt-2">
+      <i class="fa fa-plus me-1"></i>Create Your First FRA
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

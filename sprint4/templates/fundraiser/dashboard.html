@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Fundraiser Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-gauge-high me-2 text-clay"></i>My Dashboard</h1>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="stat-value">{{ stats.total or 0 }}</div>
+      <div class="stat-label"><i class="fa fa-rectangle-list me-1"></i>Total FRAs</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ stats.active or 0 }}</div>
+      <div class="stat-label"><i class="fa fa-circle-play me-1"></i>Active</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="stat-value">${{ "%.0f"|format(stats.total_raised or 0) }}</div>
+      <div class="stat-label"><i class="fa fa-dollar-sign me-1"></i>Total Raised</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card moss">
+      <div class="stat-value">{{ stats.total_views or 0 }}</div>
+      <div class="stat-label"><i class="fa fa-eye me-1"></i>Total Views</div>
+      <div class="mt-1" style="font-size:.8rem;color:var(--muted)">
+        {{ stats.total_favorites or 0 }} favourites
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent FRAs -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0 text-bark">Recent Campaigns</h5>
+  <div>
+    <a href="{{ url_for('fr_fras') }}" class="btn btn-outline-primary btn-sm me-2">
+      View All
+    </a>
+    <a href="{{ url_for('fr_create_fra') }}" class="btn btn-primary btn-sm">
+      <i class="fa fa-plus me-1"></i>Create FRA
+    </a>
+  </div>
+</div>
+
+{% if recent %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Title</th><th>Status</th><th>Goal</th>
+          <th>Raised</th><th>Views</th><th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in recent %}
+        <tr>
+          <td>
+            <a href="{{ url_for('fr_fra_detail', fra_id=f.id) }}">{{ f.title }}</a>
+          </td>
+          <td>
+            <span class="badge badge-status-{{ f.status }}">
+              {{ f.status|replace('_',' ')|title }}
+            </span>
+          </td>
+          <td>${{ "%.0f"|format(f.monetary_goal) }}</td>
+          <td class="text-moss">${{ "%.0f"|format(f.amount_raised or 0) }}</td>
+          <td>{{ f.view_count }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('fr_fra_detail', fra_id=f.id) }}"
+               class="btn btn-sm btn-outline-primary">
+              <i class="fa fa-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5 card">
+  <div class="card-body">
+    <i class="fa fa-seedling fa-3x text-clay mb-3"></i>
+    <h5>No campaigns yet</h5>
+    <p class="text-muted">Create your first fundraising activity to get started.</p>
+    <a href="{{ url_for('fr_create_fra') }}" class="btn btn-primary">
+      <i class="fa fa-plus me-1"></i>Create FRA
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
